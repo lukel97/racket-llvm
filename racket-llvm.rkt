@@ -1,8 +1,7 @@
 #lang racket/base
 
 (require ffi/unsafe
-         ffi/unsafe/define
-         ffi/cvector)
+         ffi/unsafe/define)
 
 (define-ffi-definer define-llvm (ffi-lib "libLLVM"
                                          '("6" #f)
@@ -15,20 +14,24 @@
 (define _LLVMBasicBlockRef (_cpointer 'LLVMOpaqueBasicBlock))
 (define _LLVMBuilderRef (_cpointer 'LLVMOpaqueBuilder))
 
-(define-llvm LLVMModuleCreateWithName (_fun _string -> _LLVMModuleRef))
+(define-llvm llvm-module-create-with-name (_fun _string -> _LLVMModuleRef)
+             #:c-id LLVMModuleCreateWithName)
 
-(define-llvm LLVMFunctionType (_fun  _LLVMTypeRef ; return type
-                                    (param-types : (_list i _LLVMTypeRef)) ; param types
-                                    (_int = (length param-types)) ; num params
-                                    _int  ; variadic?
-                                    -> _LLVMTypeRef))
-(define-llvm LLVMAddFunction (_fun _LLVMModuleRef
-                                   _string
-                                   _LLVMTypeRef
-                                   -> _LLVMValueRef))
+(define-llvm llvm-function-type (_fun  _LLVMTypeRef ; return type
+                                       (param-types : (_list i _LLVMTypeRef)) ; param types
+                                       (_int = (length param-types)) ; num params
+                                       _int  ; variadic?
+                                       -> _LLVMTypeRef)
+             #:c-id LLVMFunctionType)
+
+(define-llvm llvm-add-function (_fun _LLVMModuleRef
+                                     _string
+                                     _LLVMTypeRef
+                                     -> _LLVMValueRef)
+             #:c-id LLVMAddFunction)
 
 
-(define mod (LLVMModuleCreateWithName "testModule"))
+(define mod (llvm-module-create-with-name "testModule"))
 
 #| C code taken from
    https://pauladamsmith.com/blog/2015/01/how-to-get-started-with-llvm-c-api.html |#
@@ -37,48 +40,53 @@
     LLVMTypeRef ret_type = LLVMFunctionType(LLVMInt32Type(), param_types, 2, 0);
     LLVMValueRef sum = LLVMAddFunction(mod, "sum", ret_type); |#
 
-(define-llvm LLVMInt32Type (_fun -> _LLVMTypeRef))
+(define-llvm llvm-int32-type (_fun -> _LLVMTypeRef)
+             #:c-id LLVMInt32Type)
 
-(define return-type (LLVMFunctionType (LLVMInt32Type) (list (LLVMInt32Type) (LLVMInt32Type)) 0))
-(define sum (LLVMAddFunction mod "sum" return-type))
+(define return-type (llvm-function-type (llvm-int32-type) (list (llvm-int32-type) (llvm-int32-type)) 0))
+(define sum (llvm-add-function mod "sum" return-type))
 
 #| LLVMBasicBlockRef entry = LLVMAppendBasicBlock(sum, "entry"); |#
 
 
-(define-llvm LLVMAppendBasicBlock (_fun _LLVMValueRef
-                                        _string
-                                        -> _LLVMBasicBlockRef))
+(define-llvm llvm-append-basic-block (_fun _LLVMValueRef
+                                           _string
+                                           -> _LLVMBasicBlockRef)
+             #:c-id LLVMAppendBasicBlock)
 
-(define entry (LLVMAppendBasicBlock sum "entry"))
+(define entry (llvm-append-basic-block sum "entry"))
 
 #|  LLVMBuilderRef builder = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder, entry); |#
 
-(define-llvm LLVMCreateBuilder (_fun -> _LLVMBuilderRef))
+(define-llvm llvm-create-builder (_fun -> _LLVMBuilderRef) #:c-id LLVMCreateBuilder)
 
-(define-llvm LLVMPositionBuilderAtEnd (_fun _LLVMBuilderRef
-                                            _LLVMBasicBlockRef
-                                            -> _void))
+(define-llvm llvm-position-builder-at-end (_fun _LLVMBuilderRef
+                                                _LLVMBasicBlockRef
+                                                -> _void)
+             #:c-id LLVMPositionBuilderAtEnd)
 
-(define builder (LLVMCreateBuilder))
-(LLVMPositionBuilderAtEnd builder entry)
+(define builder (llvm-create-builder))
+(llvm-position-builder-at-end builder entry)
 
 #|  LLVMValueRef tmp = LLVMBuildAdd(builder, LLVMGetParam(sum, 0), LLVMGetParam(sum, 1), "tmp");
     LLVMBuildRet(builder, tmp); |#
 
 (define-llvm llvm-get-param (_fun _LLVMValueRef _int -> _LLVMValueRef) #:c-id LLVMGetParam)
 
-(define-llvm LLVMBuildAdd (_fun _LLVMBuilderRef
-                                _LLVMValueRef
-                                _LLVMValueRef
-                                _string
-                                -> _LLVMValueRef))
+(define-llvm llvm-build-add (_fun _LLVMBuilderRef
+                                  _LLVMValueRef
+                                  _LLVMValueRef
+                                  _string
+                                  -> _LLVMValueRef)
+             #:c-id LLVMBuildAdd)
 
-(define-llvm LLVMBuildRet (_fun _LLVMBuilderRef _LLVMValueRef -> _void))
+(define-llvm llvm-build-ret (_fun _LLVMBuilderRef _LLVMValueRef -> _void)
+             #:c-id LLVMBuildRet)
 
 
-(define tmp (LLVMBuildAdd builder (llvm-get-param sum 0) (llvm-get-param sum 1) "tmp"))
-(LLVMBuildRet builder tmp)
+(define tmp (llvm-build-add builder (llvm-get-param sum 0) (llvm-get-param sum 1) "tmp"))
+(llvm-build-ret builder tmp)
 
 #|  char *error = NULL;
     LLVMVerifyModule(mod, LLVMAbortProcessAction, &error);
@@ -153,13 +161,13 @@
 (define _LLVMGenericValueRef (_cpointer 'LLVMOpaqueGenericValue))
 
 (define-llvm llvm-create-generic-value-of-int (_fun _LLVMTypeRef
-                                                    _int
-                                                    _int
+                                                    _int ; value
+                                                    _int ; signed?
                                                     -> _LLVMGenericValueRef)
              #:c-id LLVMCreateGenericValueOfInt)
 
-(define args (list (llvm-create-generic-value-of-int (LLVMInt32Type) x 0)
-                   (llvm-create-generic-value-of-int (LLVMInt32Type) y 0)))
+(define args (list (llvm-create-generic-value-of-int (llvm-int32-type) x 0)
+                   (llvm-create-generic-value-of-int (llvm-int32-type) y 0)))
 
 #|  LLVMGenericValueRef res = LLVMRunFunction(engine, sum, 2, args); |#
 

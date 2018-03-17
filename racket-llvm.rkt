@@ -10,7 +10,7 @@
 (println (get-llvm-lib-dir))
 
 (define-ffi-definer define-llvm (ffi-lib "libLLVM"
-                                         ;'("6" #f)
+                                         '("6" #f)
                                          ;TODO: Add more search directories
                                          #:get-lib-dirs get-llvm-lib-dir))
 

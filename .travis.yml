@@ -4,9 +4,6 @@ os:
   - linux
   - osx
 
-compiler:
-  - clang
-
 matrix:
   allow_failures:
     - os: linux
@@ -18,7 +15,7 @@ addons:
       - ubuntu-toolchain-r-test
       - llvm-toolchain-trusty-6.0
     packages:
-      - llvm-6.0-dev
+      - llvm-6.0
       - racket
 
 before_install:

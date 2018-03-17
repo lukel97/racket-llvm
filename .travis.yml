@@ -15,7 +15,7 @@ addons:
       - ubuntu-toolchain-r-test
       - llvm-toolchain-trusty-6.0
     packages:
-      - llvm-6.0
+      - llvm-dev-6.0
       - racket
 
 before_install:
@@ -26,7 +26,7 @@ before_install:
     && brew install racket
     && raco pkg install --auto compiler-lib;
     fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PATH="/usr/lib/llvm-6.0/bin:$PATH"; llvm-config --libdir; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PATH="/usr/lib/llvm-6.0/bin:$PATH"; `ls llvm-config --libdir`; fi
 
 script:
   - raco test racket-llvm.rkt

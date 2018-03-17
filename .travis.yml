@@ -15,7 +15,7 @@ addons:
       - ubuntu-toolchain-r-test
       - llvm-toolchain-trusty-6.0
     packages:
-      - llvm-dev-6.0
+      - llvm-6.0.dev
       - racket
 
 before_install:

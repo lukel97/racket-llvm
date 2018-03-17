@@ -20,7 +20,7 @@ env:
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+      - ppa:plt/racket
       - llvm-toolchain-trusty-6.0
     packages:
       - llvm

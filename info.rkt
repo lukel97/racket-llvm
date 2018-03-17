@@ -1,5 +1,5 @@
 #lang info
-(define collection "racket-llvm")
+(define collection "llvm")
 (define deps '("base"))
 (define build-deps '("scribble-lib" "racket-doc" "rackunit-lib"))
 (define pkg-desc "LLVM bindings for Racket")

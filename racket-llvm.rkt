@@ -4,8 +4,13 @@
          ffi/unsafe/define)
 
 (define (get-llvm-lib-dir)
-  (list (string-trim
-    (with-output-to-string (λ () (system "llvm-config --libdir"))))))
+  (let* ([success #f]
+         [output (string-trim
+                   (with-output-to-string
+                     (λ () (set! success (system "llvm-config --libdir")))))])
+    (if success
+      (list output)
+      (list "/usr/local/opt/llvm/lib")))) ; fallback
 
 (define-ffi-definer define-llvm (ffi-lib "libLLVM"
                                          '("6" #f)

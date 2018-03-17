@@ -5,7 +5,8 @@
 (define (get-llvm-lib-dir)
   (let ([path (find-executable-path "llvm-config")])
     (if (not path)
-      (list "/usr/local/opt/llvm/lib") ; fallback
+      (list "/usr/local/opt/llvm/lib"
+            "/usr/lib/llvm-6.0") ; fallback
       (list (string-trim
               (with-output-to-string
                 (λ () (system* path "--libdir"))))))))

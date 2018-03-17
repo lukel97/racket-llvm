@@ -21,7 +21,7 @@ addons:
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install llvm && brew install racket; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then raco pkg install --auto compiler-lib; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ls `llvm-config --libdir`; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PATH=/usr/bin/llvm-config-6.0:$PATH; llvm-config --libdir; fi
 
 script:
   - raco test racket-llvm.rkt

@@ -16,5 +16,7 @@ script:
 
 addons:
   apt:
+    sources:
+      - llvm-toolchain-trusty-6.0
     packages:
-      - llvm
+      - llvm-6.0

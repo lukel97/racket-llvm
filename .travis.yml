@@ -20,7 +20,7 @@ env:
 addons:
   apt:
     sources:
-      - ppa:plt/racket
+      - sourceline: 'ppa:plt/racket'
       - llvm-toolchain-trusty-6.0
     packages:
       - llvm

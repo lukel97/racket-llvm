@@ -55,6 +55,9 @@
 
 (define eng (llvm-create-execution-engine-for-module mod))
 
+(llvm-link-in-mcjit)
+(llvm-initialize-native-target)
+
 #|  if (argc < 3) {
         fprintf(stderr, "usage: %s x y\n", argv[0]);
         exit(EXIT_FAILURE);

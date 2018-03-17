@@ -11,19 +11,14 @@ matrix:
   allow_failures:
     - os: linux
 
-env:
-  global:
-    - RACKET_DIR=~/racket
-  matrix:
-    - RACKET_VERSION=RELEASE
-
 addons:
   apt:
     sources:
       - sourceline: 'ppa:plt/racket'
+      - ubuntu-toolchain-r-test
       - llvm-toolchain-trusty-6.0
     packages:
-      - llvm
+      - llvm-dev
       - racket
 
 before_install:

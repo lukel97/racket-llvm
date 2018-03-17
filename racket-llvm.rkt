@@ -3,10 +3,14 @@
 (require ffi/unsafe
          ffi/unsafe/define)
 
+(define (get-llvm-lib-dir)
+  (list (string-trim
+    (with-output-to-string (λ () (system "llvm-config --libdir"))))))
+
 (define-ffi-definer define-llvm (ffi-lib "libLLVM"
                                          '("6" #f)
                                          ;TODO: Add more search directories
-                                         #:get-lib-dirs (λ () (list "/usr/local/opt/llvm/lib"))))
+                                         #:get-lib-dirs get-llvm-lib-dir))
 
 (define _LLVMModuleRef (_cpointer 'LLVMOpaqueModule))
 (define _LLVMTypeRef (_cpointer 'LLVMOpaqueType))

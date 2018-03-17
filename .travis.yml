@@ -24,7 +24,7 @@ before_install:
     && brew install llvm
     && export PATH="/usr/local/opt/llvm/bin:$PATH"
     && brew install racket
-    && raco pkg install --auto compiler-lib
+    && raco pkg install --auto compiler-lib;
     fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PATH="/usr/lib/llvm-6.0/bin:$PATH"; llvm-config --libdir; fi
 

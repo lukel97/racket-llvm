@@ -19,4 +19,4 @@ addons:
     sources:
       - llvm-toolchain-trusty-6.0
     packages:
-      - llvm-6.0
+      - llvm

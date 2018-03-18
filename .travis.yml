@@ -4,10 +4,6 @@ os:
   - linux
   - osx
 
-matrix:
-  allow_failures:
-    - os: linux
-
 addons:
   apt:
     sources:
@@ -26,7 +22,7 @@ before_install:
     && brew install racket
     && raco pkg install --auto compiler-lib;
     fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PATH="/usr/lib/llvm-6.0/bin:$PATH"; ls `llvm-config --libdir`; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PATH="/usr/lib/llvm-6.0/bin:$PATH"; fi
 
 script:
   - raco test racket-llvm.rkt

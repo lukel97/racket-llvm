@@ -1,6 +1,6 @@
 #lang racket
 
-(require "racket-llvm.rkt")
+(require llvm)
 
 #| C code taken from
    https://pauladamsmith.com/blog/2015/01/how-to-get-started-with-llvm-c-api.html

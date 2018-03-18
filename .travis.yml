@@ -25,4 +25,5 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PATH="/usr/lib/llvm-6.0/bin:$PATH"; fi
 
 script:
+  - raco pkg install
   - raco test -p racket-llvm

@@ -7,7 +7,7 @@
    This example reads in 2 ints from stdin
    and then prints the sum as well as the IR of the module |#
 
-(define mod (llvm-module-create-with-name "testModule"))
+(define mod (llvm-module "testModule"))
 
 #|  LLVMTypeRef param_types[] = { LLVMInt32Type(), LLVMInt32Type() };
     LLVMTypeRef ret_type = LLVMFunctionType(LLVMInt32Type(), param_types, 2, 0);
@@ -23,9 +23,9 @@
 #|  LLVMBuilderRef builder = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder, entry); |#
 
-(define builder (llvm-create-builder))
+(define builder (llvm-builder-create))
 
-(llvm-position-builder-at-end builder entry)
+(llvm-builder-position-at-end builder entry)
 
 #|  LLVMValueRef tmp = LLVMBuildAdd(builder, LLVMGetParam(sum, 0), LLVMGetParam(sum, 1), "tmp");
     LLVMBuildRet(builder, tmp); |#
@@ -37,7 +37,7 @@
     LLVMVerifyModule(mod, LLVMAbortProcessAction, &error);
     LLVMDisposeMessage(error); |#
 
-(llvm-verify-module mod)
+(llvm-module-verify mod)
 
 #|  LLVMExecutionEngineRef engine;
     error = NULL;

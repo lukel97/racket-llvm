@@ -106,6 +106,7 @@
            llvm-int-sge
            llvm-int-slt
            llvm-int-sle)))
+(provide _LLVMIntPredicate)
 
 (define-llvm llvm-build-int-cmp (_fun _LLVMBuilderRef
                                       _LLVMIntPredicate

@@ -6,10 +6,12 @@
 (require "module.rkt"
          "types.rkt"
          "builder.rkt"
-         "jit.rkt")
+         "jit.rkt"
+         "pass-manager.rkt")
 (provide (all-from-out
            "module.rkt"
            "types.rkt"
            "builder.rkt"
-           "jit.rkt"))
+           "jit.rkt"
+           "pass-manager.rkt"))
 

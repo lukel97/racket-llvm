@@ -23,10 +23,14 @@
 (define _LLVMBasicBlockRef (_cpointer 'LLVMOpaqueBasicBlock))
 (define _LLVMBuilderRef (_cpointer 'LLVMOpaqueBuilder))
 (define _LLVMGenericValueRef (_cpointer 'LLVMOpaqueGenericValue))
+(define _LLVMPassManagerRef (_cpointer 'LLVMOpaquePassManager))
+(define _LLVMPassManagerBuilderRef (_cpointer 'LLVMOpaquePassManagerBuilder))
 
 (provide _LLVMModuleRef
          _LLVMTypeRef
          _LLVMValueRef
          _LLVMBasicBlockRef
          _LLVMBuilderRef
-         _LLVMGenericValueRef)
+         _LLVMGenericValueRef
+         _LLVMPassManagerRef
+         _LLVMPassManagerBuilderRef)

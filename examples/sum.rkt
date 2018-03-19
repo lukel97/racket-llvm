@@ -85,4 +85,4 @@
 
 (println (llvm-generic-value-to-int res #f))
 
-(println (llvm-module-to-string mod))
+(display (llvm-module-to-string mod))

@@ -21,10 +21,6 @@
 (define-llvm llvm-get-param (_fun _LLVMValueRef _int -> _LLVMValueRef) #:c-id LLVMGetParam)
 (provide llvm-get-param)
 
-(define-llvm llvm-build-ret (_fun _LLVMBuilderRef _LLVMValueRef -> _void)
-             #:c-id LLVMBuildRet)
-(provide llvm-build-ret)
-
 (module+ test
   (require rackunit
            "module.rkt"
@@ -36,6 +32,8 @@
   (llvm-link-in-mcjit)
   (llvm-initialize-native-target)
 
+  (define eng (llvm-create-execution-engine-for-module mod))
+
   (define (check-binary-inst make-inst
                              make-type
                              create-value
@@ -45,9 +43,7 @@
                              result)
     (define builder (llvm-builder-create))
 
-    (define eng (llvm-create-execution-engine-for-module mod))
-
-    (define func-type (llvm-function-type (make-type) (list (make-type) (make-type)) #f))
+    (define func-type (llvm-function-type (make-type) (list (make-type) (make-type))))
     (define func (llvm-add-function mod "func" func-type))
 
     (define entry (llvm-append-basic-block func "entry"))
@@ -76,6 +72,95 @@
                        (λ (x) (llvm-create-generic-value-of-float (llvm-float-type) x))
                        (λ (x) (llvm-generic-value-to-float (llvm-float-type) x))
                        rhs lhs result)))
+
+#| Control flow |#
+
+(define-llvm llvm-build-ret (_fun _LLVMBuilderRef _LLVMValueRef -> _LLVMValueRef)
+             #:c-id LLVMBuildRet)
+(provide llvm-build-ret)
+
+(define-llvm llvm-build-br (_fun _LLVMBuilderRef
+                                 _LLVMBasicBlockRef ; dest
+                                 -> _LLVMValueRef)
+             #:c-id LLVMBuildBr)
+(provide llvm-build-br)
+
+(define-llvm llvm-build-cond-br (_fun _LLVMBuilderRef
+                                      _LLVMValueRef ; if
+                                      _LLVMBasicBlockRef ; then
+                                      _LLVMBasicBlockRef ; else
+                                      -> _LLVMValueRef)
+             #:c-id LLVMBuildCondBr)
+(provide llvm-build-cond-br)
+
+#| Comparisons |#
+
+(define _LLVMIntPredicate
+  (_enum '(llvm-int-eq = 32
+           llvm-int-ne
+           llvm-int-ugt
+           llvm-int-uge
+           llvm-int-ult
+           llvm-int-ule
+           llvm-int-sgt
+           llvm-int-sge
+           llvm-int-slt
+           llvm-int-sle)))
+
+(define-llvm llvm-build-int-cmp (_fun _LLVMBuilderRef
+                                      _LLVMIntPredicate
+                                      _LLVMValueRef ; lhs
+                                      _LLVMValueRef ; rhs
+                                      _string ; name
+                                      -> _LLVMValueRef)
+             #:c-id LLVMBuildICmp)
+(provide llvm-build-int-cmp)
+(module+ test
+
+  ; if 42 > 16 then 1234 else 937
+  (define (test-cond-br)
+    (define builder (llvm-builder-create))
+
+    (define func
+      (llvm-add-function mod
+                         "func"
+                         (llvm-function-type (llvm-int32-type))))
+
+    (define entry (llvm-append-basic-block func "entry"))
+    (llvm-builder-position-at-end builder entry)
+
+    (define x (llvm-const-int (llvm-int32-type) 42))
+    (define y (llvm-const-int (llvm-int32-type) 16))
+    (define cmp (llvm-build-int-cmp builder 'llvm-int-ugt x y "greaterThan"))
+
+    (define then (llvm-append-basic-block func "then"))
+    (define els (llvm-append-basic-block func "else"))
+
+    (define cond-br (llvm-build-cond-br builder cmp then els))
+
+    (llvm-builder-position-at-end builder then)
+    (llvm-build-ret builder (llvm-const-int (llvm-int32-type) 1234))
+
+    (llvm-builder-position-at-end builder els)
+    (llvm-build-ret builder (llvm-const-int (llvm-int32-type) 937))
+
+    (define res (llvm-generic-value-to-int (llvm-run-function eng func (list)) #f))
+
+    (check-equal? 1234 res))
+
+  (test-cond-br))
+
+#| Constants |#
+
+(define-llvm llvm-const-int (_fun (type value [sign-extend? #f]) ::
+                                  (type : _LLVMTypeRef)
+                                  (value : _llong)
+                                  (sign-extend? : _bool)
+                                  -> _LLVMValueRef)
+             #:c-id LLVMConstInt)
+(provide llvm-const-int)
+
+#| Operators |#
 
 (define-llvm llvm-build-add (_fun _LLVMBuilderRef
                                   _LLVMValueRef

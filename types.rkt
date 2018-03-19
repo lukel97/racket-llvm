@@ -40,10 +40,11 @@
              #:c-id LLVMGenericValueToFloat)
 (provide llvm-generic-value-to-float)
 
-(define-llvm llvm-function-type (_fun  _LLVMTypeRef ; return type
-                                       (param-types : (_list i _LLVMTypeRef)) ; param types
+(define-llvm llvm-function-type (_fun  (return-type [param-types (list)] [variadic? #f]) ::
+                                       (return-type : _LLVMTypeRef)
+                                       (param-types : (_list i _LLVMTypeRef))
                                        (_int = (length param-types)) ; num params
-                                       _bool ; variadic?
+                                       (variadic? : _bool)
                                        -> _LLVMTypeRef)
              #:c-id LLVMFunctionType)
 (provide llvm-function-type)

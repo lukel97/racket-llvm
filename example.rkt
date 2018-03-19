@@ -13,7 +13,9 @@
     LLVMTypeRef ret_type = LLVMFunctionType(LLVMInt32Type(), param_types, 2, 0);
     LLVMValueRef sum = LLVMAddFunction(mod, "sum", ret_type); |#
 
-(define return-type (llvm-function-type (llvm-int32-type) (list (llvm-int32-type) (llvm-int32-type)) #f))
+(define return-type (llvm-function-type (llvm-int32-type)
+                                        (list (llvm-int32-type)
+                                              (llvm-int32-type))))
 (define sum (llvm-add-function mod "sum" return-type))
 
 #| LLVMBasicBlockRef entry = LLVMAppendBasicBlock(sum, "entry"); |#
